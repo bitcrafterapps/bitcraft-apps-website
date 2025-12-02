@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Layout } from '../components/Layout'
 import { Button } from '../components/Button'
 import { Badge } from '../components/Badge'
