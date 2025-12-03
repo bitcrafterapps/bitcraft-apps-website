@@ -19,6 +19,7 @@ import {
   Star,
   ArrowRight,
   X,
+  ExternalLink,
 } from '../components/Icons'
 
 // ============================================
@@ -256,12 +257,39 @@ const AppCardWithGallery = ({
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </Button>
+                {app.externalLink && (
+                  <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto" asChild>
+                    <a href={app.externalLink} target="_blank" rel="noopener noreferrer">
+                      Visit Website
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </Button>
+                )}
               </div>
             ) : (
-              <Button variant="secondary" size="sm" className="gap-2">
-                Get Notified
-                <ChevronRight className="w-4 h-4" />
-              </Button>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                {app.externalLink ? (
+                  <>
+                    <Button size="sm" className="gap-2 w-full sm:w-auto" asChild>
+                      <a href={app.externalLink} target="_blank" rel="noopener noreferrer">
+                        Visit Website
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto" asChild>
+                      <Link to={`/apps/${app.id}`}>
+                        Learn More
+                        <ChevronRight className="w-4 h-4" />
+                      </Link>
+                    </Button>
+                  </>
+                ) : (
+                  <Button variant="secondary" size="sm" className="gap-2">
+                    Get Notified
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         </div>

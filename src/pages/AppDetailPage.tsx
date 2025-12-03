@@ -7,7 +7,7 @@ import { Button } from '../components/Button'
 import { Badge } from '../components/Badge'
 import { Card } from '../components/Card'
 import { apps } from '../data/apps'
-import { ArrowRight, Apple, Star, ChevronRight, X, ArrowLeft } from '../components/Icons'
+import { ArrowRight, Apple, Star, ChevronRight, X, ArrowLeft, ExternalLink } from '../components/Icons'
 
 // Image Modal
 const ImageModal = ({ src, onClose }: { src: string; onClose: () => void }) => {
@@ -134,16 +134,40 @@ export default function AppDetailPage() {
                       <Apple className="w-5 h-5" />
                       Download on App Store
                     </Button>
-                    <Button variant="outline" size="lg" className="w-full sm:w-auto gap-2">
-                      Read Docs
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
+                    {app.externalLink && (
+                      <Button 
+                        variant="outline" 
+                        size="lg" 
+                        className="w-full sm:w-auto gap-2"
+                        asChild
+                      >
+                        <a href={app.externalLink} target="_blank" rel="noopener noreferrer">
+                          Visit Website
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </Button>
+                    )}
                   </>
                 ) : (
-                  <Button size="lg" className="gap-2">
-                    Notify Me
-                    <ChevronRight className="w-4 h-4" />
-                  </Button>
+                  <>
+                    {app.externalLink ? (
+                      <Button 
+                        size="lg" 
+                        className="w-full sm:w-auto gap-2"
+                        asChild
+                      >
+                        <a href={app.externalLink} target="_blank" rel="noopener noreferrer">
+                          Visit Website
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button size="lg" className="gap-2">
+                        Notify Me
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
             </motion.div>
@@ -286,10 +310,25 @@ export default function AppDetailPage() {
                 <p className="text-slate-400 mb-8 text-lg max-w-md mx-auto">
                   Join thousands of users who trust {app.name} for their daily needs.
                 </p>
-                <Button size="lg" className="gap-2">
-                  <Apple className="w-5 h-5" />
-                  Download Now
-                </Button>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Button size="lg" className="gap-2">
+                    <Apple className="w-5 h-5" />
+                    Download Now
+                  </Button>
+                  {app.externalLink && (
+                    <Button 
+                      variant="outline" 
+                      size="lg" 
+                      className="gap-2"
+                      asChild
+                    >
+                      <a href={app.externalLink} target="_blank" rel="noopener noreferrer">
+                        Visit Website
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
               </div>
             </Card>
           </motion.div>

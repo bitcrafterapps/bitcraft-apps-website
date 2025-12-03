@@ -18,6 +18,7 @@ export interface App {
   images?: string[]
   comingSoon: boolean
   downloadLink?: string
+  externalLink?: string
   category: AppCategory
 }
 
@@ -39,6 +40,7 @@ export const apps: App[] = [
     images: ['/rs-home.jpg', '/rs-scan.jpg', '/rs-scan1.jpg', '/rs-scan2.jpg', '/rs-tanks.jpg'],
     comingSoon: false,
     downloadLink: '#',
+    externalLink: 'https://reef-scan.vercel.app',
     category: 'apps',
   },
   {
@@ -75,6 +77,7 @@ export const apps: App[] = [
     status: 'Coming Soon',
     features: ['Build Tanks', 'Collect Fish', 'Unlock Species', 'Fun Challenges'],
     comingSoon: true,
+    externalLink: 'https://fishy-on-me.vercel.app',
     category: 'games',
   },
 ]
