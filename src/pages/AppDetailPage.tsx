@@ -7,7 +7,7 @@ import { Button } from '../components/Button'
 import { Badge } from '../components/Badge'
 import { Card } from '../components/Card'
 import { apps } from '../data/apps'
-import { ArrowRight, Apple, Star, ChevronRight, X, ArrowLeft, ExternalLink } from '../components/Icons'
+import { Apple, Star, ChevronRight, X, ArrowLeft, ExternalLink } from '../components/Icons'
 
 // Image Modal
 const ImageModal = ({ src, onClose }: { src: string; onClose: () => void }) => {
