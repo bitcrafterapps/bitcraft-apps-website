@@ -53,61 +53,89 @@ const ImageModal = ({ src, onClose }: { src: string; onClose: () => void }) => {
 }
 
 // ============================================
-// APP GALLERY
+// APP GALLERY (Sliding panel)
 // ============================================
-const AppGallery = ({ images }: { images: string[] }) => {
+const AppGallery = ({ 
+  images, 
+  isOpen, 
+  onClose 
+}: { 
+  images: string[]
+  isOpen: boolean
+  onClose: () => void 
+}) => {
   const [index, setIndex] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
 
   useEffect(() => {
-    if (isZoomed) return
+    if (!isOpen || isZoomed) return
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length)
     }, 4000)
     return () => clearInterval(timer)
-  }, [images.length, isZoomed])
+  }, [images.length, isOpen, isZoomed])
 
   return (
     <>
-      <div 
-        className="relative w-full h-full rounded-2xl overflow-hidden cursor-zoom-in group"
-        onClick={() => setIsZoomed(true)}
-      >
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={images[index]}
-            src={images[index]}
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="absolute inset-0 w-full h-full object-contain p-2"
-            alt="App screenshot"
-          />
-        </AnimatePresence>
-        
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-dark-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        {/* Dots */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-          {images.map((_, i) => (
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 50, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: 50, scale: 0.95 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="absolute right-0 top-0 bottom-0 w-[280px] lg:w-[320px] z-20 flex items-center"
+          >
+            {/* Close button */}
             <button
-              key={i}
               onClick={(e) => {
                 e.stopPropagation()
-                setIndex(i)
+                onClose()
               }}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                i === index 
-                  ? 'bg-cyan-400 w-6 shadow-lg shadow-cyan-400/50' 
-                  : 'bg-white/30 hover:bg-white/50'
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
+              className="absolute -left-3 top-1/2 -translate-y-1/2 z-30 w-6 h-12 bg-dark-700 hover:bg-dark-600 border border-dark-600 rounded-l-lg flex items-center justify-center transition-colors"
+            >
+              <ChevronRight className="w-4 h-4 text-slate-400" />
+            </button>
+            
+            <div 
+              className="relative w-full h-[85%] rounded-2xl overflow-hidden cursor-zoom-in bg-dark-800/90 backdrop-blur-sm border border-dark-700"
+        onClick={() => setIsZoomed(true)}
+      >
+         <AnimatePresence mode="wait">
+           <motion.img
+             key={images[index]}
+             src={images[index]}
+                  initial={{ opacity: 0, scale: 1.05 }}
+             animate={{ opacity: 1, scale: 1 }}
+             exit={{ opacity: 0 }}
+             transition={{ duration: 0.5 }}
+                  className="absolute inset-0 w-full h-full object-contain p-3"
+             alt="App screenshot"
+           />
+         </AnimatePresence>
+         
+         {/* Dots */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+           {images.map((_, i) => (
+             <button
+               key={i}
+               onClick={(e) => {
+                 e.stopPropagation()
+                 setIndex(i)
+               }}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      i === index 
+                        ? 'bg-cyan-400 w-5 shadow-lg shadow-cyan-400/50' 
+                        : 'bg-white/30 hover:bg-white/50'
+               }`}
+               aria-label={`Go to slide ${i + 1}`}
+             />
+           ))}
+         </div>
       </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isZoomed && (
@@ -118,6 +146,136 @@ const AppGallery = ({ images }: { images: string[] }) => {
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+// ============================================
+// APP CARD with interactive gallery
+// ============================================
+const AppCardWithGallery = ({ 
+  app, 
+  index: cardIndex 
+}: { 
+  app: typeof appsByCategory.apps[0]
+  index: number 
+}) => {
+  const [showGallery, setShowGallery] = useState(false)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: cardIndex * 0.1 }}
+    >
+      <Card
+        variant={app.comingSoon ? 'default' : 'gradient'}
+        className={`group p-6 lg:p-8 overflow-hidden relative ${
+          app.comingSoon ? 'opacity-80' : ''
+        }`}
+      >
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+          {/* App Icon - Click/Hover to show gallery */}
+          <div className="flex-shrink-0 relative">
+  <motion.div
+              className={`cursor-pointer relative ${app.images && app.images.length > 0 ? 'group/icon' : ''}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                if (app.images && app.images.length > 0) {
+                  setShowGallery(!showGallery)
+                }
+              }}
+            >
+              <app.icon className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl shadow-xl shadow-dark-950" />
+              
+              {/* Hover indicator for gallery */}
+              {app.images && app.images.length > 0 && (
+                <div className={`absolute inset-0 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                  showGallery 
+                    ? 'bg-cyan-500/20 border-2 border-cyan-500' 
+                    : 'bg-dark-900/0 group-hover/icon:bg-dark-900/60'
+                }`}>
+                  <motion.div 
+                    className={`text-white text-xs font-medium px-2 py-1 rounded-full bg-dark-900/80 backdrop-blur-sm transition-opacity ${
+                      showGallery ? 'opacity-100' : 'opacity-0 group-hover/icon:opacity-100'
+                    }`}
+                  >
+                    {showGallery ? 'Hide' : 'Preview'}
+                  </motion.div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+          
+          <div className="flex-1 text-center sm:text-left">
+            <div className="flex items-center justify-center sm:justify-start gap-2 mb-3">
+              <Badge variant={app.comingSoon ? 'secondary' : 'success'}>
+                {app.status}
+              </Badge>
+              {!app.comingSoon && (
+                <Badge variant="outline" className="gap-1">
+                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  4.9
+                </Badge>
+              )}
+            </div>
+            
+            <h3 className="font-display text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+              {app.name}
+            </h3>
+            <p className="text-cyan-400 font-medium mb-3">
+              {app.tagline}
+            </p>
+            <p className="text-slate-400 mb-5 leading-relaxed">
+              {app.description}
+            </p>
+            
+            {/* Features */}
+            <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-6">
+              {app.features.slice(0, 4).map((feature) => (
+                <span
+                  key={feature}
+                  className="text-xs px-3 py-1.5 rounded-full bg-dark-700/50 text-slate-300 border border-dark-600/50"
+                >
+                  {feature}
+                </span>
+              ))}
+            </div>
+            
+            {/* Actions */}
+            {!app.comingSoon ? (
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Button size="sm" className="gap-2 w-full sm:w-auto">
+                  <Apple className="w-4 h-4" />
+                  App Store
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto" asChild>
+                  <Link to={`/apps/${app.id}`}>
+                    Learn More
+                    <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <Button variant="secondary" size="sm" className="gap-2">
+                Get Notified
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Sliding Gallery */}
+        {app.images && app.images.length > 0 && (
+          <AppGallery 
+            images={app.images} 
+            isOpen={showGallery}
+            onClose={() => setShowGallery(false)}
+          />
+        )}
+      </Card>
+    </motion.div>
   )
 }
 
@@ -285,14 +443,14 @@ export default function HomePage() {
         </div>
 
         {/* Main Hero Content */}
-        <motion.div 
+          <motion.div 
           className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32"
           style={{ opacity }}
-        >
+          >
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Left Column - Text Content */}
             <div className="text-center lg:text-left">
-              <motion.div
+            <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
@@ -317,7 +475,7 @@ export default function HomePage() {
               >
                 <span className="block text-white">Exceptional Apps.</span>
                 <span className="block">
-                  <span className="text-gradient">Built With Precision.</span>
+                    <span className="text-gradient">Built With Precision.</span>
                 </span>
               </motion.h1>
 
@@ -357,22 +515,22 @@ export default function HomePage() {
               >
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
                   {stats.map((stat, index) => (
-                    <motion.div 
-                      key={stat.label} 
-                      className="text-center"
+                      <motion.div 
+                        key={stat.label} 
+                        className="text-center"
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: 0.5 + index * 0.1 }}
                     >
                       <div className="text-2xl mb-1">{stat.icon}</div>
                       <div className="text-2xl lg:text-3xl font-bold text-gradient mb-1">
-                        {stat.value}
-                      </div>
+                          {stat.value}
+                        </div>
                       <div className="text-xs text-slate-500 uppercase tracking-wider">
-                        {stat.label}
-                      </div>
-                    </motion.div>
-                  ))}
+                          {stat.label}
+                        </div>
+                      </motion.div>
+                    ))}
                 </div>
               </motion.div>
             </div>
@@ -382,31 +540,31 @@ export default function HomePage() {
               <PhoneMockup images={featuredApp?.images} />
             </div>
           </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div 
+          {/* Scroll indicator */}
+          <motion.div 
           className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-        >
-          <motion.div
+          >
+            <motion.div
             className="flex flex-col items-center gap-2 text-slate-500"
             animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          >
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            >
             <span className="text-xs uppercase tracking-widest">Scroll to explore</span>
             <div className="w-6 h-10 border-2 border-slate-600 rounded-full flex justify-center pt-2">
-              <motion.div 
+                <motion.div 
                 className="w-1.5 h-1.5 bg-cyan-400 rounded-full"
                 animate={{ y: [0, 12, 0], opacity: [1, 0.5, 1] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              />
-            </div>
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </section>
+        </section>
 
       {/* ============================================
           APPS SECTION
@@ -414,157 +572,58 @@ export default function HomePage() {
       <section id="apps" className="py-20 lg:py-32 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
             className="text-center mb-16"
-          >
+            >
             <Badge variant="coral" className="mb-4">
               <span className="mr-2">📱</span>
-              Our Portfolio
-            </Badge>
+                Our Portfolio
+              </Badge>
             <h2 className="font-display text-display font-bold mb-4">
-              Apps We've <span className="text-gradient">Crafted</span>
-            </h2>
+                Apps We've <span className="text-gradient">Crafted</span>
+              </h2>
             <p className="text-slate-400 max-w-xl mx-auto text-lg">
-              Quality mobile experiences designed for real users. Each app reflects
-              our commitment to excellence.
-            </p>
-          </motion.div>
+                Quality mobile experiences designed for real users. Each app reflects
+                our commitment to excellence.
+              </p>
+            </motion.div>
 
-          {/* Apps Category */}
+            {/* Apps Category */}
           <div className="mb-16">
             <h3 className="text-xl font-semibold text-white mb-8 flex items-center gap-3">
               <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
                 📱
               </span>
               Apps
-            </h3>
+              </h3>
             
             <div className="space-y-8">
-              {appsByCategory.apps.map((app, index) => (
-                <motion.div
-                  key={app.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Card
-                    variant={app.comingSoon ? 'default' : 'gradient'}
-                    className={`group p-6 lg:p-8 overflow-hidden ${
-                      app.comingSoon ? 'opacity-80' : ''
-                    }`}
-                  >
-                    <div className="grid lg:grid-cols-2 gap-8 items-center">
-                      {/* App Info */}
-                      <div className="order-2 lg:order-1">
-                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-                          <motion.div 
-                            className="flex-shrink-0"
-                            whileHover={{ scale: 1.05, rotate: 5 }}
-                          >
-                            <app.icon className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl shadow-xl shadow-dark-950" />
-                          </motion.div>
-                          
-                          <div className="flex-1 text-center sm:text-left">
-                            <div className="flex items-center justify-center sm:justify-start gap-2 mb-3">
-                              <Badge variant={app.comingSoon ? 'secondary' : 'success'}>
-                                {app.status}
-                              </Badge>
-                              {!app.comingSoon && (
-                                <Badge variant="outline" className="gap-1">
-                                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                                  4.9
-                                </Badge>
-                              )}
-                            </div>
-                            
-                            <h3 className="font-display text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                              {app.name}
-                            </h3>
-                            <p className="text-cyan-400 font-medium mb-3">
-                              {app.tagline}
-                            </p>
-                            <p className="text-slate-400 mb-5 leading-relaxed">
-                              {app.description}
-                            </p>
-                            
-                            {/* Features */}
-                            <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-6">
-                              {app.features.slice(0, 4).map((feature) => (
-                                <span
-                                  key={feature}
-                                  className="text-xs px-3 py-1.5 rounded-full bg-dark-700/50 text-slate-300 border border-dark-600/50"
-                                >
-                                  {feature}
-                                </span>
-                              ))}
-                            </div>
-                            
-                            {/* Actions */}
-                            {!app.comingSoon ? (
-                              <div className="flex flex-col sm:flex-row items-center gap-3">
-                                <Button size="sm" className="gap-2 w-full sm:w-auto">
-                                  <Apple className="w-4 h-4" />
-                                  App Store
-                                </Button>
-                                <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto" asChild>
-                                  <Link to={`/apps/${app.id}`}>
-                                    Learn More
-                                    <ChevronRight className="w-4 h-4" />
-                                  </Link>
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button variant="secondary" size="sm" className="gap-2">
-                                Get Notified
-                                <ChevronRight className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* App Images */}
-                      <div className="order-1 lg:order-2 h-[200px] sm:h-[280px] lg:h-[350px]">
-                        {app.images && app.images.length > 0 ? (
-                          <AppGallery images={app.images} />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center rounded-2xl bg-dark-800/50 border border-dark-700/50">
-                            <div className="text-center">
-                              <div className="text-5xl mb-3">🚀</div>
-                              <p className="text-slate-400 font-medium">Coming Soon</p>
-                              <p className="text-slate-500 text-sm">Stay tuned for updates</p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
+                {appsByCategory.apps.map((app, index) => (
+                <AppCardWithGallery key={app.id} app={app} index={index} />
+                ))}
+              </div>
             </div>
-          </div>
 
-          {/* Games Category */}
-          <div>
+            {/* Games Category */}
+            <div>
             <h3 className="text-xl font-semibold text-white mb-8 flex items-center gap-3">
               <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20">
                 🎮
               </span>
               Games
-            </h3>
+              </h3>
             
             <div className="grid md:grid-cols-2 gap-6">
-              {appsByCategory.games.map((app, index) => (
-                <motion.div
-                  key={app.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
+                {appsByCategory.games.map((app, index) => (
+                  <motion.div
+                    key={app.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
                 >
                   <Card
                     variant="default"
@@ -577,67 +636,67 @@ export default function HomePage() {
                       
                       <div className="flex-1">
                         <Badge variant="secondary" className="mb-2">
-                          {app.status}
-                        </Badge>
+                                  {app.status}
+                                </Badge>
                         <h4 className="font-display text-lg font-bold text-white mb-1">
-                          {app.name}
+                                {app.name}
                         </h4>
                         <p className="text-violet-400 text-sm font-medium mb-2">
-                          {app.tagline}
-                        </p>
+                                {app.tagline}
+                              </p>
                         <p className="text-slate-500 text-sm line-clamp-2">
-                          {app.description}
-                        </p>
+                                {app.description}
+                              </p>
                       </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              ))}
+                      </div>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* ============================================
           FEATURES - BENTO GRID
           ============================================ */}
-      <section id="features" className="py-20 lg:py-32 relative">
+        <section id="features" className="py-20 lg:py-32 relative">
         {/* Background accent */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[150px]" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <Badge className="mb-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <Badge className="mb-4">
               <span className="mr-2">⭐</span>
-              Why Choose BitCraft
-            </Badge>
+                Why Choose BitCraft
+              </Badge>
             <h2 className="font-display text-display font-bold mb-4">
               World-Class Engineering
-              <br />
-              <span className="text-gradient">Meets Beautiful Design</span>
-            </h2>
+                <br />
+                <span className="text-gradient">Meets Beautiful Design</span>
+              </h2>
             <p className="text-slate-400 max-w-xl mx-auto text-lg">
-              We don't just build apps—we craft experiences that users love and
-              businesses trust.
-            </p>
-          </motion.div>
+                We don't just build apps—we craft experiences that users love and
+                businesses trust.
+              </p>
+            </motion.div>
 
           {/* Bento Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
+              {features.map((feature, index) => (
+                <motion.div
+                  key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
                 className={`${feature.span} ${feature.span === 'col-span-2' ? 'lg:col-span-2' : ''}`}
               >
@@ -651,30 +710,30 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                        {feature.title}
-                      </h3>
+                      {feature.title}
+                    </h3>
                       <p className="text-slate-400 text-sm leading-relaxed">
-                        {feature.description}
-                      </p>
+                      {feature.description}
+                    </p>
                     </div>
                   </div>
-                </Card>
-              </motion.div>
-            ))}
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* ============================================
           CTA SECTION
           ============================================ */}
-      <section className="py-20 lg:py-32">
+        <section className="py-20 lg:py-32">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+            >
             <Card 
               variant="gradient"
               className="relative overflow-hidden p-8 lg:p-16 text-center"
@@ -688,36 +747,36 @@ export default function HomePage() {
               <div className="relative z-10">
                 <Badge variant="coral" className="mb-6">
                   <span className="mr-2">🚀</span>
-                  Ready to Build?
-                </Badge>
+                    Ready to Build?
+                  </Badge>
 
                 <h2 className="font-display text-3xl lg:text-5xl font-bold mb-6 text-white">
-                  Let's Create Something
-                  <br />
-                  <span className="text-gradient-warm">Extraordinary Together</span>
-                </h2>
+                    Let's Create Something
+                    <br />
+                    <span className="text-gradient-warm">Extraordinary Together</span>
+                  </h2>
 
                 <p className="text-slate-400 max-w-xl mx-auto mb-10 text-lg">
-                  Whether you're looking to download our apps or partner with us on
-                  your next project, we'd love to hear from you.
-                </p>
+                    Whether you're looking to download our apps or partner with us on
+                    your next project, we'd love to hear from you.
+                  </p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Button size="lg" className="group w-full sm:w-auto" asChild>
-                    <a href="#apps">
-                      Download Our Apps
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                    </a>
-                  </Button>
+                      <a href="#apps">
+                        Download Our Apps
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    </Button>
                   <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
-                    <Link to="/contact">Partner With BitCraft</Link>
-                  </Button>
+                      <Link to="/contact">Partner With BitCraft</Link>
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Card>
-          </motion.div>
-        </div>
-      </section>
+              </Card>
+            </motion.div>
+          </div>
+        </section>
     </Layout>
   )
 }
