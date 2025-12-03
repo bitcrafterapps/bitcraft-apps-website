@@ -339,48 +339,54 @@ const features = [
     title: 'Engineering Excellence',
     description: '25+ years of full-stack development experience delivering rock-solid, high-performance applications.',
     gradient: 'from-cyan-500/20 to-cyan-600/5',
-    span: 'col-span-2',
+    span: 'md:col-span-2',
     iconColor: 'text-cyan-400',
+    iconBg: 'bg-cyan-500/10 border-cyan-500/20',
   },
   {
     icon: Users,
     title: 'User-First Design',
     description: 'Every interaction crafted for clarity and delight.',
     gradient: 'from-violet-500/20 to-violet-600/5',
-    span: 'col-span-1',
+    span: '',
     iconColor: 'text-violet-400',
+    iconBg: 'bg-violet-500/10 border-violet-500/20',
   },
   {
     icon: Lock,
     title: 'Secure & Reliable',
     description: 'Industry-leading security practices.',
     gradient: 'from-emerald-500/20 to-emerald-600/5',
-    span: 'col-span-1',
+    span: '',
     iconColor: 'text-emerald-400',
+    iconBg: 'bg-emerald-500/10 border-emerald-500/20',
   },
   {
     icon: Sparkles,
     title: 'Polished UI/UX',
     description: 'Beautiful visuals and smooth interactions define every product.',
     gradient: 'from-orange-500/20 to-orange-600/5',
-    span: 'col-span-1',
+    span: '',
     iconColor: 'text-orange-400',
+    iconBg: 'bg-orange-500/10 border-orange-500/20',
   },
   {
     icon: RefreshCw,
     title: 'Continuous Updates',
     description: 'Regular improvements based on real-world feedback.',
     gradient: 'from-rose-500/20 to-rose-600/5',
-    span: 'col-span-1',
+    span: '',
     iconColor: 'text-rose-400',
+    iconBg: 'bg-rose-500/10 border-rose-500/20',
   },
   {
     icon: Trophy,
     title: 'Proven Track Record',
     description: 'Successful products across multiple categories—always focusing on quality and user satisfaction.',
     gradient: 'from-amber-500/20 to-amber-600/5',
-    span: 'col-span-2',
+    span: 'md:col-span-2',
     iconColor: 'text-amber-400',
+    iconBg: 'bg-amber-500/10 border-amber-500/20',
   },
 ]
 
@@ -689,38 +695,41 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={feature.title}
+          {/* Features Grid - Mobile Optimized */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 transition={{ delay: index * 0.05 }}
-                className={`${feature.span} ${feature.span === 'col-span-2' ? 'lg:col-span-2' : ''}`}
+                className={feature.span}
               >
                 <Card 
                   variant="glass"
-                  className={`h-full p-6 lg:p-8 group hover:border-cyan-500/20 bg-gradient-to-br ${feature.gradient}`}
+                  className={`h-full p-4 sm:p-5 lg:p-6 group hover:border-cyan-500/20 bg-gradient-to-br ${feature.gradient}`}
                 >
-                  <div className={`flex ${feature.span === 'col-span-2' ? 'flex-row items-start gap-6' : 'flex-col'}`}>
-                    <div className={`feature-icon mb-4 ${feature.span === 'col-span-2' ? 'mb-0' : ''}`}>
-                      <feature.icon className={`w-6 h-6 ${feature.iconColor}`} />
+                  <div className="flex items-start gap-4">
+                    {/* Icon */}
+                    <div className={`flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${feature.iconBg} border flex items-center justify-center`}>
+                      <feature.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${feature.iconColor}`} />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors">
-                      {feature.title}
-                    </h3>
-                      <p className="text-slate-400 text-sm leading-relaxed">
-                      {feature.description}
-                    </p>
+                    
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-base sm:text-lg text-white mb-1 group-hover:text-cyan-400 transition-colors">
+                        {feature.title}
+                      </h3>
+                      <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                        {feature.description}
+                      </p>
                     </div>
                   </div>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
           </div>
         </section>
 
