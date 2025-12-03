@@ -615,48 +615,16 @@ export default function HomePage() {
 
             {/* Games Category */}
             <div>
-            <h3 className="text-xl font-semibold text-white mb-8 flex items-center gap-3">
-              <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20">
-                🎮
-              </span>
-              Games
+              <h3 className="text-xl font-semibold text-white mb-8 flex items-center gap-3">
+                <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20">
+                  🎮
+                </span>
+                Games
               </h3>
-            
-            <div className="grid md:grid-cols-2 gap-6">
+              
+              <div className="space-y-8">
                 {appsByCategory.games.map((app, index) => (
-                  <motion.div
-                    key={app.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                >
-                  <Card
-                    variant="default"
-                    className="group p-6 h-full opacity-80"
-                  >
-                    <div className="flex items-start gap-4">
-                      <motion.div whileHover={{ scale: 1.05 }}>
-                        <app.icon className="w-16 h-16 rounded-xl shadow-lg" />
-                      </motion.div>
-                      
-                      <div className="flex-1">
-                        <Badge variant="secondary" className="mb-2">
-                                  {app.status}
-                                </Badge>
-                        <h4 className="font-display text-lg font-bold text-white mb-1">
-                                {app.name}
-                        </h4>
-                        <p className="text-violet-400 text-sm font-medium mb-2">
-                                {app.tagline}
-                              </p>
-                        <p className="text-slate-500 text-sm line-clamp-2">
-                                {app.description}
-                              </p>
-                      </div>
-                      </div>
-                    </Card>
-                  </motion.div>
+                  <AppCardWithGallery key={app.id} app={app} index={index} />
                 ))}
               </div>
             </div>
