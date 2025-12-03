@@ -291,7 +291,7 @@ export default function HomePage() {
         >
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             {/* Left Column - Text Content */}
-            <div className="text-center lg:text-left order-2 lg:order-1">
+            <div className="text-center lg:text-left">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -378,7 +378,7 @@ export default function HomePage() {
             </div>
 
             {/* Right Column - Phone Mockup */}
-            <div className="order-1 lg:order-2 flex justify-center">
+            <div className="flex justify-center">
               <PhoneMockup images={featuredApp?.images} />
             </div>
           </div>
