@@ -377,8 +377,8 @@ export default function HomePage() {
               </motion.div>
             </div>
 
-            {/* Right Column - Phone Mockup */}
-            <div className="flex justify-center">
+            {/* Right Column - Phone Mockup (hidden on mobile) */}
+            <div className="hidden lg:flex justify-center">
               <PhoneMockup images={featuredApp?.images} />
             </div>
           </div>
