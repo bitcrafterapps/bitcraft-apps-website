@@ -19,6 +19,7 @@ import {
   Play,
   Star,
   ArrowRight,
+  ArrowLeft,
   Github,
   Twitter,
   Linkedin,
@@ -28,7 +29,9 @@ import {
   Send,
   MessageSquare,
   Briefcase,
-  Bug
+  Bug,
+  Check,
+  Zap
 } from 'lucide-react'
 
 export {
@@ -52,6 +55,7 @@ export {
   Play,
   Star,
   ArrowRight,
+  ArrowLeft,
   Github,
   Twitter,
   Linkedin,
@@ -61,7 +65,9 @@ export {
   Send,
   MessageSquare,
   Briefcase,
-  Bug
+  Bug,
+  Check,
+  Zap
 }
 
 // Custom BitCraft logo

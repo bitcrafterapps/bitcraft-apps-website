@@ -21,28 +21,30 @@ import {
   X,
 } from '../components/Icons'
 
-// Image Modal Component
+// ============================================
+// IMAGE MODAL
+// ============================================
 const ImageModal = ({ src, onClose }: { src: string; onClose: () => void }) => {
   return createPortal(
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-dark-950/95 backdrop-blur-xl p-4"
       onClick={onClose}
     >
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors bg-black/20 p-2 rounded-full backdrop-blur-md"
+        className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-3 rounded-full backdrop-blur-md"
       >
-        <X className="w-8 h-8" />
+        <X className="w-6 h-6" />
       </button>
       <motion.img
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         src={src}
-        className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+        className="max-w-full max-h-full object-contain rounded-2xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       />
     </motion.div>,
@@ -50,14 +52,15 @@ const ImageModal = ({ src, onClose }: { src: string; onClose: () => void }) => {
   )
 }
 
-// App Gallery Component
+// ============================================
+// APP GALLERY
+// ============================================
 const AppGallery = ({ images }: { images: string[] }) => {
   const [index, setIndex] = useState(0)
   const [isZoomed, setIsZoomed] = useState(false)
 
   useEffect(() => {
     if (isZoomed) return
-
     const timer = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length)
     }, 4000)
@@ -67,40 +70,43 @@ const AppGallery = ({ images }: { images: string[] }) => {
   return (
     <>
       <div 
-        className="relative w-full h-full rounded-xl overflow-hidden group-hover:shadow-lg transition-shadow duration-500 cursor-zoom-in"
+        className="relative w-full h-full rounded-2xl overflow-hidden cursor-zoom-in group"
         onClick={() => setIsZoomed(true)}
       >
-         <AnimatePresence mode="wait">
-           {/* Main Image - Fitted */}
-           <motion.img
-             key={images[index]}
-             src={images[index]}
-             initial={{ opacity: 0, scale: 0.95 }}
-             animate={{ opacity: 1, scale: 1 }}
-             exit={{ opacity: 0 }}
-             transition={{ duration: 0.5 }}
-             className="absolute inset-0 w-full h-full object-contain p-4 z-10"
-             alt="App screenshot"
-           />
-         </AnimatePresence>
-         
-         {/* Dots */}
-         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-           {images.map((_, i) => (
-             <button
-               key={i}
-               onClick={(e) => {
-                 e.preventDefault()
-                 e.stopPropagation()
-                 setIndex(i)
-               }}
-               className={`w-2 h-2 rounded-full transition-all duration-300 shadow-sm ${
-                 i === index ? 'bg-brand-500 w-4' : 'bg-slate-300 hover:bg-brand-400'
-               }`}
-               aria-label={`Go to slide ${i + 1}`}
-             />
-           ))}
-         </div>
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={images[index]}
+            src={images[index]}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 w-full h-full object-contain p-2"
+            alt="App screenshot"
+          />
+        </AnimatePresence>
+        
+        {/* Hover overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-dark-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        
+        {/* Dots */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+          {images.map((_, i) => (
+            <button
+              key={i}
+              onClick={(e) => {
+                e.stopPropagation()
+                setIndex(i)
+              }}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                i === index 
+                  ? 'bg-cyan-400 w-6 shadow-lg shadow-cyan-400/50' 
+                  : 'bg-white/30 hover:bg-white/50'
+              }`}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
       </div>
 
       <AnimatePresence>
@@ -115,202 +121,186 @@ const AppGallery = ({ images }: { images: string[] }) => {
   )
 }
 
-// Floating geometric shapes for parallax
-const FloatingShape = ({ 
-  className, 
-  delay = 0 
-}: { 
-  className?: string
-  delay?: number 
-}) => (
-  <motion.div
-    className={className}
-    initial={{ opacity: 0, scale: 0.8 }}
-    animate={{ 
-      opacity: 1, 
-      scale: 1,
-      y: [0, -15, 0],
-    }}
-    transition={{ 
-      opacity: { duration: 0.8, delay },
-      scale: { duration: 0.8, delay },
-      y: { duration: 4 + delay, repeat: Infinity, ease: "easeInOut" }
-    }}
-  />
-)
+// ============================================
+// PHONE MOCKUP
+// ============================================
+const PhoneMockup = ({ images }: { images?: string[] }) => {
+  const [currentImage, setCurrentImage] = useState(0)
 
-// Feature data
+  useEffect(() => {
+    if (!images || images.length <= 1) return
+    const timer = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length)
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [images])
+
+  return (
+    <motion.div 
+      className="phone-mockup relative"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.3 }}
+    >
+      {/* Glow effect behind phone */}
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-500/20 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 right-0 w-[200px] h-[200px] bg-violet-500/15 rounded-full blur-[80px]" />
+      </div>
+      
+      <div className="phone-screen">
+        {images && images.length > 0 ? (
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={images[currentImage]}
+              src={images[currentImage]}
+              alt="App screenshot"
+              className="w-full h-full object-cover"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            />
+          </AnimatePresence>
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-dark-800 to-dark-900 flex items-center justify-center">
+            <span className="text-4xl">📱</span>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+// ============================================
+// BENTO FEATURES
+// ============================================
 const features = [
   {
     icon: Shield,
-    title: 'Engineering You Can Trust',
-    description:
-      'With over 25 years of full-stack development experience, BitCraft delivers rock-solid, high-performance applications built on proven engineering principles.',
-    gradient: 'from-brand-500/20 to-brand-600/10',
+    title: 'Engineering Excellence',
+    description: '25+ years of full-stack development experience delivering rock-solid, high-performance applications.',
+    gradient: 'from-cyan-500/20 to-cyan-600/5',
+    span: 'col-span-2',
+    iconColor: 'text-cyan-400',
   },
   {
     icon: Users,
     title: 'User-First Design',
-    description:
-      'Every screen, interaction, and detail is crafted for clarity, ease of use, and enjoyment—ensuring our apps feel intuitive from the very first tap.',
-    gradient: 'from-violet-500/20 to-violet-600/10',
+    description: 'Every interaction crafted for clarity and delight.',
+    gradient: 'from-violet-500/20 to-violet-600/5',
+    span: 'col-span-1',
+    iconColor: 'text-violet-400',
   },
   {
     icon: Lock,
     title: 'Secure & Reliable',
-    description:
-      'We follow industry-leading security and QA practices, ensuring stable performance, safe data handling, and dependable long-term operation.',
-    gradient: 'from-emerald-500/20 to-emerald-600/10',
+    description: 'Industry-leading security practices.',
+    gradient: 'from-emerald-500/20 to-emerald-600/5',
+    span: 'col-span-1',
+    iconColor: 'text-emerald-400',
   },
   {
     icon: Sparkles,
-    title: 'Polished, Modern UI/UX',
-    description:
-      'Beautiful visuals, smooth interactions, and clean layouts define every BitCraft product—because great design builds trust.',
-    gradient: 'from-amber-500/20 to-amber-600/10',
+    title: 'Polished UI/UX',
+    description: 'Beautiful visuals and smooth interactions define every product.',
+    gradient: 'from-orange-500/20 to-orange-600/5',
+    span: 'col-span-1',
+    iconColor: 'text-orange-400',
   },
   {
     icon: RefreshCw,
-    title: 'Continuous Updates & Support',
-    description:
-      "Our commitment doesn't stop at launch. We refine, improve, and enhance our apps regularly based on real-world feedback and evolving platform standards.",
-    gradient: 'from-rose-500/20 to-rose-600/10',
+    title: 'Continuous Updates',
+    description: 'Regular improvements based on real-world feedback.',
+    gradient: 'from-rose-500/20 to-rose-600/5',
+    span: 'col-span-1',
+    iconColor: 'text-rose-400',
   },
   {
     icon: Trophy,
     title: 'Proven Track Record',
-    description:
-      'From mobile games to utility apps, BitCraft has delivered successful products across multiple categories—always focusing on quality, performance, and user satisfaction.',
-    gradient: 'from-cyan-500/20 to-cyan-600/10',
+    description: 'Successful products across multiple categories—always focusing on quality and user satisfaction.',
+    gradient: 'from-amber-500/20 to-amber-600/5',
+    span: 'col-span-2',
+    iconColor: 'text-amber-400',
   },
 ]
 
-// Apps data
-// Now imported from ../data/apps
+// ============================================
+// STATS DATA
+// ============================================
+const stats = [
+  { value: '25+', label: 'Years Experience', icon: '🎯' },
+  { value: '100%', label: 'User Focused', icon: '💎' },
+  { value: '5★', label: 'App Quality', icon: '⭐' },
+  { value: '24/7', label: 'Support Ready', icon: '🛡️' },
+]
 
-// Animation variants
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5 },
-}
-
-const staggerContainer = {
-  animate: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-}
-
+// ============================================
+// MAIN COMPONENT
+// ============================================
 export default function HomePage() {
   const heroRef = useRef<HTMLElement>(null)
-  
-  // Parallax scroll transforms
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"]
   })
   
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "50%"])
-  const textY = useTransform(scrollYProgress, [0, 1], ["0%", "100%"])
-  const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [1, 0.8, 0])
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.9])
-  
-  // Different parallax speeds for floating elements
-  const floatY1 = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
-  const floatY3 = useTransform(scrollYProgress, [0, 1], ["0%", "45%"])
-  const floatRotate = useTransform(scrollYProgress, [0, 1], [0, 45])
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+
+  // Get featured app (ReefScan)
+  const featuredApp = appsByCategory.apps.find(app => app.id === 'reefscan')
 
   return (
     <Layout>
-      <main>
-        {/* Hero Section with Parallax - Fits in Viewport */}
-        <section ref={heroRef} className="relative h-screen flex items-center justify-center overflow-hidden bg-white">
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0">
-            <img 
-              src="/hero-bg.png" 
-              alt="Technology Background" 
-              className="w-full h-full object-cover opacity-40"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-white" />
-          </div>
-
-          {/* Multi-layer gradient background with parallax */}
+      {/* ============================================
+          HERO SECTION
+          ============================================ */}
+      <section 
+        ref={heroRef} 
+        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+      >
+        {/* Background Effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Animated gradient orbs */}
           <motion.div 
-            className="absolute inset-0 pointer-events-none mix-blend-multiply opacity-30"
+            className="orb orb-cyan w-[600px] h-[600px] -top-32 -right-32"
             style={{ y: backgroundY }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-50/30 to-white" />
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(56,189,248,0.25),transparent)]" />
-            <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_60%_40%_at_80%_100%,rgba(139,92,246,0.15),transparent)]" />
-          </motion.div>
-
-          {/* Animated mesh gradient overlay */}
-          <div className="absolute inset-0 opacity-50 pointer-events-none">
-            <div className="absolute inset-0 bg-mesh" />
-          </div>
-
-          {/* Floating geometric shapes */}
+          />
           <motion.div 
-            className="absolute inset-0 pointer-events-none overflow-hidden"
-            style={{ y: floatY1 }}
-          >
-            <FloatingShape 
-              className="absolute -top-20 -right-20 w-[400px] h-[400px] rounded-full bg-gradient-to-br from-brand-500/25 to-brand-600/10 blur-[80px]"
-              delay={0}
-            />
-            <FloatingShape 
-              className="absolute top-1/4 -left-20 w-[300px] h-[300px] rounded-full bg-gradient-to-tr from-violet-500/15 to-purple-600/5 blur-[60px]"
-              delay={0.2}
-            />
-          </motion.div>
-
-          {/* Geometric decorations */}
+            className="orb orb-violet w-[500px] h-[500px] top-1/3 -left-48"
+            style={{ y: backgroundY }}
+          />
           <motion.div 
-            className="absolute inset-0 pointer-events-none"
-            style={{ y: floatY3, rotate: floatRotate }}
-          >
-            <div className="absolute top-24 right-[12%] w-16 h-16 border border-brand-500/20 rounded-2xl rotate-12 hidden lg:block" />
-            <div className="absolute top-32 right-[9%] w-6 h-6 bg-brand-500/10 rounded-lg rotate-45 hidden lg:block" />
-            <div className="absolute bottom-1/4 left-[8%] w-12 h-12 border border-violet-500/15 rounded-full hidden lg:block" />
-          </motion.div>
+            className="orb orb-orange w-[300px] h-[300px] bottom-0 right-1/4"
+            style={{ y: backgroundY }}
+          />
+          
+          {/* Grid overlay */}
+          <div className="absolute inset-0 bg-grid opacity-20" />
+          
+          {/* Radial gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-radial from-transparent via-dark-900/50 to-dark-900" />
+        </div>
 
-          {/* Code-like floating elements */}
-          <motion.div className="absolute inset-0 pointer-events-none" style={{ y: floatY1 }}>
-            <motion.div 
-              className="absolute top-28 left-[6%] font-mono text-xs text-brand-500/25 hidden xl:block"
-              animate={{ opacity: [0.2, 0.35, 0.2] }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              {'<BitCraft />'}
-            </motion.div>
-            <motion.div 
-              className="absolute bottom-1/3 right-[6%] font-mono text-xs text-violet-500/20 hidden xl:block"
-              animate={{ opacity: [0.15, 0.3, 0.15] }}
-              transition={{ duration: 4, repeat: Infinity, delay: 1 }}
-            >
-              {'{ quality: 100 }'}
-            </motion.div>
-          </motion.div>
-
-          {/* Main hero content */}
-          <motion.div 
-            className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 lg:pt-24"
-            style={{ y: textY, opacity, scale }}
-          >
-            <motion.div
-              initial="initial"
-              animate="animate"
-              variants={staggerContainer}
-              className="text-center"
-            >
-              <motion.div variants={fadeInUp}>
-                <Badge className="mb-4 backdrop-blur-sm">
+        {/* Main Hero Content */}
+        <motion.div 
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32"
+          style={{ opacity }}
+        >
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            {/* Left Column - Text Content */}
+            <div className="text-center lg:text-left order-2 lg:order-1">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <Badge variant="glow" className="mb-6">
                   <motion.span 
-                    className="mr-1.5 inline-block"
-                    animate={{ rotate: [0, 360] }}
+                    className="mr-2"
+                    animate={{ rotate: 360 }}
                     transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                   >
                     ✦
@@ -320,418 +310,414 @@ export default function HomePage() {
               </motion.div>
 
               <motion.h1
-                variants={fadeInUp}
-                className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight leading-[1.1] mb-4 lg:mb-6 text-slate-900"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="font-display text-hero font-bold tracking-tight mb-6"
               >
-                <span className="block">Exceptional Apps.</span>
+                <span className="block text-white">Exceptional Apps.</span>
                 <span className="block">
-                  <span className="relative inline-block">
-                    <span className="text-gradient">Built With Precision.</span>
-                    <motion.span 
-                      className="absolute -bottom-1 left-0 h-0.5 lg:h-1 bg-gradient-to-r from-brand-500 to-brand-400 rounded-full"
-                      initial={{ width: "0%" }}
-                      animate={{ width: "100%" }}
-                      transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
-                    />
-                  </span>
+                  <span className="text-gradient">Built With Precision.</span>
                 </span>
-                <span className="block text-slate-900">Trusted Worldwide.</span>
               </motion.h1>
 
               <motion.p
-                variants={fadeInUp}
-                className="text-base lg:text-lg text-slate-600 max-w-2xl mx-auto mb-6 lg:mb-8 leading-relaxed font-medium"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-lg lg:text-xl text-slate-400 max-w-xl mx-auto lg:mx-0 mb-8 leading-relaxed"
               >
                 BitCraft builds secure, reliable, and polished mobile apps for iOS and
                 Android. Backed by decades of full-stack engineering experience.
               </motion.p>
 
               <motion.div
-                variants={fadeInUp}
-                className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8 lg:mb-10"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12"
               >
-                <Button size="lg" className="group" asChild>
+                <Button size="lg" className="group w-full sm:w-auto" asChild>
                   <a href="#apps">
                     Explore Our Apps
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </a>
                 </Button>
-                <Button variant="secondary" size="lg" asChild>
+                <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
                   <Link to="/contact">Partner With Us</Link>
                 </Button>
               </motion.div>
 
-              {/* Stats - Compact */}
-              <motion.div variants={fadeInUp}>
-                <div className="glass rounded-2xl p-4 lg:p-6 max-w-3xl mx-auto">
-                  <div className="grid grid-cols-4 gap-4 lg:gap-8">
-                    {[
-                      { value: '25+', label: 'Years' },
-                      { value: '100%', label: 'User Focus' },
-                      { value: '5★', label: 'Quality' },
-                      { value: '24/7', label: 'Support' },
-                    ].map((stat, index) => (
-                      <motion.div 
-                        key={stat.label} 
-                        className="text-center"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8 + index * 0.1 }}
-                      >
-                        <div className="text-xl lg:text-2xl font-bold text-gradient">
-                          {stat.value}
-                        </div>
-                        <div className="text-[10px] lg:text-xs text-muted-foreground uppercase tracking-wider">
-                          {stat.label}
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
+              {/* Stats Row */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="glass rounded-2xl p-6"
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                  {stats.map((stat, index) => (
+                    <motion.div 
+                      key={stat.label} 
+                      className="text-center"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 + index * 0.1 }}
+                    >
+                      <div className="text-2xl mb-1">{stat.icon}</div>
+                      <div className="text-2xl lg:text-3xl font-bold text-gradient mb-1">
+                        {stat.value}
+                      </div>
+                      <div className="text-xs text-slate-500 uppercase tracking-wider">
+                        {stat.label}
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
-            </motion.div>
-          </motion.div>
-
-          {/* Scroll indicator */}
-          <motion.div 
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2 }}
-          >
-            <motion.div
-              className="flex flex-col items-center gap-1 text-muted-foreground"
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <span className="text-[10px] uppercase tracking-wider">Scroll</span>
-              <div className="w-5 h-8 border border-muted-foreground/30 rounded-full flex justify-center pt-1.5">
-                <motion.div 
-                  className="w-1 h-1 bg-brand-400 rounded-full"
-                  animate={{ y: [0, 10, 0], opacity: [1, 0.5, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                />
-              </div>
-            </motion.div>
-          </motion.div>
-        </section>
-
-        {/* Apps Section */}
-        <section id="apps" className="py-12 sm:py-20 lg:py-32 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-8 sm:mb-12 lg:mb-16"
-            >
-              <Badge variant="coral" className="mb-3 sm:mb-4">
-                <span className="mr-1.5">📱</span>
-                Our Portfolio
-              </Badge>
-              <h2 className="font-display text-2xl sm:text-3xl lg:text-5xl font-bold mb-3 sm:mb-4">
-                Apps We've <span className="text-gradient">Crafted</span>
-              </h2>
-              <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto px-2">
-                Quality mobile experiences designed for real users. Each app reflects
-                our commitment to excellence.
-              </p>
-            </motion.div>
-
-            {/* Apps Category */}
-            <div className="mb-8 sm:mb-12">
-              <h3 className="text-lg sm:text-xl font-semibold text-slate-300 mb-4 sm:mb-6 flex items-center gap-2">
-                <span className="text-brand-400">📱</span> Apps
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-                {appsByCategory.apps.map((app, index) => (
-                  <motion.div
-                    key={app.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="md:col-span-2"
-                  >
-                    <Card
-                      className={`group p-4 sm:p-6 lg:p-8 app-card-hover h-full overflow-hidden bg-slate-900 border-slate-800 text-white ${
-                        app.comingSoon ? 'opacity-90' : ''
-                      }`}
-                    >
-                      <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8 items-center">
-                        <div className="order-2 md:order-1">
-                          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
-                            <div className="flex-shrink-0">
-                              <app.icon className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl shadow-lg" />
-                            </div>
-                            <div className="flex-1 min-w-0 text-center sm:text-left">
-                              <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                                <Badge
-                                  variant={app.comingSoon ? 'secondary' : 'default'}
-                                  className="text-2xs"
-                                >
-                                  {app.status}
-                                </Badge>
-                              </div>
-                              <h3 className="font-display text-lg sm:text-xl font-bold mb-1 group-hover:text-brand-400 transition-colors">
-                                {app.name}
-                              </h3>
-                              <p className="text-sm text-brand-400 font-medium mb-2 sm:mb-3">
-                                {app.tagline}
-                              </p>
-                              <p className="text-xs sm:text-sm text-slate-400 mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-2">
-                                {app.description}
-                              </p>
-                              <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 sm:gap-2 mb-4 sm:mb-5">
-                                {app.features.slice(0, 4).map((feature) => (
-                                  <span
-                                    key={feature}
-                                    className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-slate-800 text-slate-300"
-                                  >
-                                    {feature}
-                                  </span>
-                                ))}
-                              </div>
-                              {!app.comingSoon ? (
-                                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-                                  <Button size="sm" className="gap-2 w-full sm:w-auto text-xs sm:text-sm">
-                                    <Apple className="w-4 h-4" />
-                                    App Store
-                                  </Button>
-                                  <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto text-xs sm:text-sm" asChild>
-                                    <Link to={`/apps/${app.id}`}>
-                                      <Star className="w-4 h-4" />
-                                      Learn More
-                                    </Link>
-                                  </Button>
-                                </div>
-                              ) : (
-                                <Button variant="secondary" size="sm" className="gap-2 w-full sm:w-auto">
-                                  Get Notified
-                                  <ChevronRight className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="order-1 md:order-2 w-full h-[120px] sm:h-[180px] md:h-full md:min-h-[300px]">
-                          {app.images && app.images.length > 0 ? (
-                            <AppGallery images={app.images} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50">
-                              <div className="text-center p-4">
-                                <div className="text-3xl sm:text-4xl mb-2">🚀</div>
-                                <p className="text-slate-400 text-sm sm:text-base font-medium">Coming Soon</p>
-                                <p className="text-slate-500 text-xs mt-1">Stay tuned for updates</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
             </div>
 
-            {/* Games Category */}
-            <div>
-              <h3 className="text-lg sm:text-xl font-semibold text-slate-300 mb-4 sm:mb-6 flex items-center gap-2">
-                <span className="text-brand-400">🎮</span> Games
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
-                {appsByCategory.games.map((app, index) => (
-                  <motion.div
-                    key={app.id}
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="md:col-span-2"
-                  >
-                    <Card
-                      className={`group p-4 sm:p-6 lg:p-8 app-card-hover h-full overflow-hidden bg-slate-900 border-slate-800 text-white ${
-                        app.comingSoon ? 'opacity-90' : ''
-                      }`}
-                    >
-                      <div className="flex flex-col md:grid md:grid-cols-2 gap-6 md:gap-8 items-center">
-                        <div className="order-2 md:order-1">
-                          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-5">
-                            <div className="flex-shrink-0">
-                              <app.icon className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl shadow-lg" />
-                            </div>
-                            <div className="flex-1 min-w-0 text-center sm:text-left">
-                              <div className="flex items-center justify-center sm:justify-start gap-2 mb-2">
-                                <Badge
-                                  variant={app.comingSoon ? 'secondary' : 'default'}
-                                  className="text-2xs"
-                                >
-                                  {app.status}
-                                </Badge>
-                              </div>
-                              <h3 className="font-display text-lg sm:text-xl font-bold mb-1 group-hover:text-brand-400 transition-colors">
-                                {app.name}
-                              </h3>
-                              <p className="text-sm text-brand-400 font-medium mb-2 sm:mb-3">
-                                {app.tagline}
-                              </p>
-                              <p className="text-xs sm:text-sm text-slate-400 mb-3 sm:mb-4 line-clamp-3 sm:line-clamp-2">
-                                {app.description}
-                              </p>
-                              <div className="flex flex-wrap justify-center sm:justify-start gap-1.5 sm:gap-2 mb-4 sm:mb-5">
-                                {app.features.slice(0, 4).map((feature) => (
-                                  <span
-                                    key={feature}
-                                    className="text-[10px] sm:text-xs px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-slate-800 text-slate-300"
-                                  >
-                                    {feature}
-                                  </span>
-                                ))}
-                              </div>
-                              {!app.comingSoon ? (
-                                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-                                  <Button size="sm" className="gap-2 w-full sm:w-auto text-xs sm:text-sm">
-                                    <Apple className="w-4 h-4" />
-                                    App Store
-                                  </Button>
-                                  <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto text-xs sm:text-sm" asChild>
-                                    <Link to={`/apps/${app.id}`}>
-                                      <Star className="w-4 h-4" />
-                                      Learn More
-                                    </Link>
-                                  </Button>
-                                </div>
-                              ) : (
-                                <Button variant="secondary" size="sm" className="gap-2 w-full sm:w-auto">
-                                  Get Notified
-                                  <ChevronRight className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                        <div className="order-1 md:order-2 w-full h-[120px] sm:h-[180px] md:h-full md:min-h-[300px]">
-                          {app.images && app.images.length > 0 ? (
-                            <AppGallery images={app.images} />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50">
-                              <div className="text-center p-4">
-                                <div className="text-3xl sm:text-4xl mb-2">🎮</div>
-                                <p className="text-slate-400 text-sm sm:text-base font-medium">Coming Soon</p>
-                                <p className="text-slate-500 text-xs mt-1">Stay tuned for updates</p>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+            {/* Right Column - Phone Mockup */}
+            <div className="order-1 lg:order-2 flex justify-center">
+              <PhoneMockup images={featuredApp?.images} />
             </div>
           </div>
-        </section>
+        </motion.div>
 
-        {/* Features Section */}
-        <section id="features" className="py-20 lg:py-32 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-100/40 to-transparent pointer-events-none" />
+        {/* Scroll indicator */}
+        <motion.div 
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          <motion.div
+            className="flex flex-col items-center gap-2 text-slate-500"
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <span className="text-xs uppercase tracking-widest">Scroll to explore</span>
+            <div className="w-6 h-10 border-2 border-slate-600 rounded-full flex justify-center pt-2">
+              <motion.div 
+                className="w-1.5 h-1.5 bg-cyan-400 rounded-full"
+                animate={{ y: [0, 12, 0], opacity: [1, 0.5, 1] }}
+                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </div>
+          </motion.div>
+        </motion.div>
+      </section>
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <Badge className="mb-4">
-                <span className="mr-1.5">⭐</span>
-                Why Choose BitCraft
-              </Badge>
-              <h2 className="font-display text-3xl lg:text-5xl font-bold mb-4">
-                Where World-Class Engineering
-                <br />
-                <span className="text-gradient">Meets Beautiful Design</span>
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">
-                We don't just build apps—we craft experiences that users love and
-                businesses trust.
-              </p>
-            </motion.div>
+      {/* ============================================
+          APPS SECTION
+          ============================================ */}
+      <section id="apps" className="py-20 lg:py-32 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge variant="coral" className="mb-4">
+              <span className="mr-2">📱</span>
+              Our Portfolio
+            </Badge>
+            <h2 className="font-display text-display font-bold mb-4">
+              Apps We've <span className="text-gradient">Crafted</span>
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto text-lg">
+              Quality mobile experiences designed for real users. Each app reflects
+              our commitment to excellence.
+            </p>
+          </motion.div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {features.map((feature, index) => (
+          {/* Apps Category */}
+          <div className="mb-16">
+            <h3 className="text-xl font-semibold text-white mb-8 flex items-center gap-3">
+              <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
+                📱
+              </span>
+              Apps
+            </h3>
+            
+            <div className="space-y-8">
+              {appsByCategory.apps.map((app, index) => (
                 <motion.div
-                  key={feature.title}
+                  key={app.id}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="group h-full p-6 hover:border-brand-500/30 transition-all duration-300 bg-slate-900 border-slate-800 text-white">
-                    <div
-                      className={`feature-icon mb-5 bg-gradient-to-br ${feature.gradient}`}
-                    >
-                      <feature.icon className="w-6 h-6 text-brand-400" />
+                  <Card
+                    variant={app.comingSoon ? 'default' : 'gradient'}
+                    className={`group p-6 lg:p-8 overflow-hidden ${
+                      app.comingSoon ? 'opacity-80' : ''
+                    }`}
+                  >
+                    <div className="grid lg:grid-cols-2 gap-8 items-center">
+                      {/* App Info */}
+                      <div className="order-2 lg:order-1">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+                          <motion.div 
+                            className="flex-shrink-0"
+                            whileHover={{ scale: 1.05, rotate: 5 }}
+                          >
+                            <app.icon className="w-20 h-20 lg:w-24 lg:h-24 rounded-2xl shadow-xl shadow-dark-950" />
+                          </motion.div>
+                          
+                          <div className="flex-1 text-center sm:text-left">
+                            <div className="flex items-center justify-center sm:justify-start gap-2 mb-3">
+                              <Badge variant={app.comingSoon ? 'secondary' : 'success'}>
+                                {app.status}
+                              </Badge>
+                              {!app.comingSoon && (
+                                <Badge variant="outline" className="gap-1">
+                                  <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                                  4.9
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <h3 className="font-display text-2xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                              {app.name}
+                            </h3>
+                            <p className="text-cyan-400 font-medium mb-3">
+                              {app.tagline}
+                            </p>
+                            <p className="text-slate-400 mb-5 leading-relaxed">
+                              {app.description}
+                            </p>
+                            
+                            {/* Features */}
+                            <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-6">
+                              {app.features.slice(0, 4).map((feature) => (
+                                <span
+                                  key={feature}
+                                  className="text-xs px-3 py-1.5 rounded-full bg-dark-700/50 text-slate-300 border border-dark-600/50"
+                                >
+                                  {feature}
+                                </span>
+                              ))}
+                            </div>
+                            
+                            {/* Actions */}
+                            {!app.comingSoon ? (
+                              <div className="flex flex-col sm:flex-row items-center gap-3">
+                                <Button size="sm" className="gap-2 w-full sm:w-auto">
+                                  <Apple className="w-4 h-4" />
+                                  App Store
+                                </Button>
+                                <Button variant="outline" size="sm" className="gap-2 w-full sm:w-auto" asChild>
+                                  <Link to={`/apps/${app.id}`}>
+                                    Learn More
+                                    <ChevronRight className="w-4 h-4" />
+                                  </Link>
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button variant="secondary" size="sm" className="gap-2">
+                                Get Notified
+                                <ChevronRight className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* App Images */}
+                      <div className="order-1 lg:order-2 h-[200px] sm:h-[280px] lg:h-[350px]">
+                        {app.images && app.images.length > 0 ? (
+                          <AppGallery images={app.images} />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center rounded-2xl bg-dark-800/50 border border-dark-700/50">
+                            <div className="text-center">
+                              <div className="text-5xl mb-3">🚀</div>
+                              <p className="text-slate-400 font-medium">Coming Soon</p>
+                              <p className="text-slate-500 text-sm">Stay tuned for updates</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <h3 className="font-semibold text-lg mb-2 group-hover:text-brand-400 transition-colors">
-                      {feature.title}
-                    </h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">
-                      {feature.description}
-                    </p>
                   </Card>
                 </motion.div>
               ))}
             </div>
           </div>
-        </section>
 
-        {/* CTA Section */}
-        <section className="py-20 lg:py-32">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-            >
-              <Card className="relative overflow-hidden p-8 lg:p-16 text-center bg-slate-900 border-slate-800 shadow-2xl">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-brand-500/20 rounded-full blur-[100px]" />
-
-                <div className="relative">
-                  <Badge variant="coral" className="mb-6 bg-coral-500/10 text-coral-300 border-coral-500/20">
-                    <span className="mr-1.5">🚀</span>
-                    Ready to Build?
-                  </Badge>
-
-                  <h2 className="font-display text-3xl lg:text-5xl font-bold mb-4 text-white">
-                    Let's Create Something
-                    <br />
-                    <span className="text-gradient-warm">Extraordinary Together</span>
-                  </h2>
-
-                  <p className="text-slate-400 max-w-xl mx-auto mb-8 text-lg">
-                    Whether you're looking to download our apps or partner with us on
-                    your next project, we'd love to hear from you.
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Button size="lg" className="group" asChild>
-                      <a href="#apps">
-                        Download Our Apps
-                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </a>
-                    </Button>
-                    <Button variant="outline" size="lg" asChild>
-                      <Link to="/contact">Partner With BitCraft</Link>
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </motion.div>
+          {/* Games Category */}
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-8 flex items-center gap-3">
+              <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20">
+                🎮
+              </span>
+              Games
+            </h3>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {appsByCategory.games.map((app, index) => (
+                <motion.div
+                  key={app.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <Card
+                    variant="default"
+                    className="group p-6 h-full opacity-80"
+                  >
+                    <div className="flex items-start gap-4">
+                      <motion.div whileHover={{ scale: 1.05 }}>
+                        <app.icon className="w-16 h-16 rounded-xl shadow-lg" />
+                      </motion.div>
+                      
+                      <div className="flex-1">
+                        <Badge variant="secondary" className="mb-2">
+                          {app.status}
+                        </Badge>
+                        <h4 className="font-display text-lg font-bold text-white mb-1">
+                          {app.name}
+                        </h4>
+                        <p className="text-violet-400 text-sm font-medium mb-2">
+                          {app.tagline}
+                        </p>
+                        <p className="text-slate-500 text-sm line-clamp-2">
+                          {app.description}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
+
+      {/* ============================================
+          FEATURES - BENTO GRID
+          ============================================ */}
+      <section id="features" className="py-20 lg:py-32 relative">
+        {/* Background accent */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[150px]" />
+        </div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Section Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <Badge className="mb-4">
+              <span className="mr-2">⭐</span>
+              Why Choose BitCraft
+            </Badge>
+            <h2 className="font-display text-display font-bold mb-4">
+              World-Class Engineering
+              <br />
+              <span className="text-gradient">Meets Beautiful Design</span>
+            </h2>
+            <p className="text-slate-400 max-w-xl mx-auto text-lg">
+              We don't just build apps—we craft experiences that users love and
+              businesses trust.
+            </p>
+          </motion.div>
+
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {features.map((feature, index) => (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+                className={`${feature.span} ${feature.span === 'col-span-2' ? 'lg:col-span-2' : ''}`}
+              >
+                <Card 
+                  variant="glass"
+                  className={`h-full p-6 lg:p-8 group hover:border-cyan-500/20 bg-gradient-to-br ${feature.gradient}`}
+                >
+                  <div className={`flex ${feature.span === 'col-span-2' ? 'flex-row items-start gap-6' : 'flex-col'}`}>
+                    <div className={`feature-icon mb-4 ${feature.span === 'col-span-2' ? 'mb-0' : ''}`}>
+                      <feature.icon className={`w-6 h-6 ${feature.iconColor}`} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg text-white mb-2 group-hover:text-cyan-400 transition-colors">
+                        {feature.title}
+                      </h3>
+                      <p className="text-slate-400 text-sm leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============================================
+          CTA SECTION
+          ============================================ */}
+      <section className="py-20 lg:py-32">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+          >
+            <Card 
+              variant="gradient"
+              className="relative overflow-hidden p-8 lg:p-16 text-center"
+            >
+              {/* Background glow */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-cyan-500/20 rounded-full blur-[100px]" />
+                <div className="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-[400px] h-[400px] bg-violet-500/15 rounded-full blur-[100px]" />
+              </div>
+
+              <div className="relative z-10">
+                <Badge variant="coral" className="mb-6">
+                  <span className="mr-2">🚀</span>
+                  Ready to Build?
+                </Badge>
+
+                <h2 className="font-display text-3xl lg:text-5xl font-bold mb-6 text-white">
+                  Let's Create Something
+                  <br />
+                  <span className="text-gradient-warm">Extraordinary Together</span>
+                </h2>
+
+                <p className="text-slate-400 max-w-xl mx-auto mb-10 text-lg">
+                  Whether you're looking to download our apps or partner with us on
+                  your next project, we'd love to hear from you.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                  <Button size="lg" className="group w-full sm:w-auto" asChild>
+                    <a href="#apps">
+                      Download Our Apps
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </Button>
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto" asChild>
+                    <Link to="/contact">Partner With BitCraft</Link>
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        </div>
+      </section>
     </Layout>
   )
 }
-

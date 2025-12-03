@@ -1,31 +1,34 @@
 import * as React from 'react'
 import { cn } from '@/lib/utils'
 
-const Card = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, style, ...props }, ref) => {
-  const hasDarkBg = className?.includes('bg-slate-900')
-  return (
-    <div
-      ref={ref}
-      className={cn(
-        'rounded-3xl shadow-soft',
-        !className?.includes('bg-') && 'bg-card border border-border/50',
-        className
-      )}
-      style={{
-        ...style,
-        // Force solid background for dark cards
-        ...(hasDarkBg ? { 
-          backgroundColor: '#0f172a',
-          opacity: 1,
-        } : {})
-      }}
-      {...props}
-    />
-  )
-})
+export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'glass' | 'gradient' | 'glow'
+  hover?: boolean
+}
+
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ className, variant = 'default', hover = true, ...props }, ref) => {
+    const variants = {
+      default: 'bg-dark-800/80 border-dark-700/50',
+      glass: 'glass-card',
+      gradient: 'gradient-border bg-dark-800/90',
+      glow: 'bg-dark-800/80 border-cyan-500/20 glow-cyan',
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          'rounded-2xl border backdrop-blur-sm transition-all duration-300',
+          variants[variant],
+          hover && 'card-hover',
+          className
+        )}
+        {...props}
+      />
+    )
+  }
+)
 Card.displayName = 'Card'
 
 const CardHeader = React.forwardRef<
@@ -46,7 +49,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn('text-xl font-semibold leading-none tracking-tight', className)}
+    className={cn('font-display text-xl font-bold text-white', className)}
     {...props}
   />
 ))
@@ -58,7 +61,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm text-muted-foreground', className)}
+    className={cn('text-sm text-slate-400', className)}
     {...props}
   />
 ))
@@ -85,4 +88,3 @@ const CardFooter = React.forwardRef<
 CardFooter.displayName = 'CardFooter'
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
-
